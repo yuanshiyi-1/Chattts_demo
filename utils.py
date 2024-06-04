@@ -87,13 +87,7 @@ def remove_chinese_punctuation(text):
     :param text:
     :return:
     """
-    pattern = r'\[(.*?)\]'
-    matches = re.findall(pattern, text)
-    for match in matches:
-        if match != "uv_break" and match != "laugh" and match != "lbreak" and match != "cry":
-            text = text.replace("[" + match + "]", match)
-    chinese_punctuation_pattern = r"[：；！（）【】『』「」《》－‘“’”:,;!\(\)><\-]"
-    text = re.sub(chinese_punctuation_pattern, ' ', text)
+    text = re.sub(r'[^a-zA-Z0-9\u4e00-\u9fff\[\]\.,\？%\!\_、\u2026\"\"]', ',', text)
     # 使用正则表达式将多个连续的句号替换为一个句号
     text = re.sub(r'。{2,}', '。', text)
     return text
