@@ -130,7 +130,7 @@ def split_text(text, min_length=60):
     :param min_length:
     :return:
     """
-    sentence_delimiters = re.compile(r'([。？！\.\n]+)')
+    sentence_delimiters = re.compile(r'([。，？！\.\n]+)')
     sentences = re.split(sentence_delimiters, text)
     # print(sentences)
     # exit()
