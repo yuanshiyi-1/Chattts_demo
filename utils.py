@@ -190,7 +190,7 @@ def split_text(text, min_length=100):
         segments.append(current_segment)
     # result = [convert_numbers_to_chinese(remove_chinese_punctuation(_.strip())) for _ in result if _.strip()]
     segments = [normalize_zh(_.strip()) for _ in segments if _.strip()]
-    return result
+    return segments
 
 
 def normalize_zh(text):
