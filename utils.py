@@ -123,13 +123,13 @@ def convert_numbers_to_chinese(text):
     return cn2an.transform(text, "an2cn")
 
 
-def split_text(text, min_length=60):
+def split_text(text, min_length=100):
     """
     将文本分割为长度不小于min_length的句子
     :param text:
     :param min_length:
     :return:
-    """
+
     sentence_delimiters = re.compile(r'([。？！\.\n]+)')
     sentences = re.split(sentence_delimiters, text)
     # print(sentences)
@@ -149,8 +149,47 @@ def split_text(text, min_length=60):
             result[-1] += current_sentence
         else:
             result.append(current_sentence)
+    """
+
+    segments = []
+    current_segment = ""
+    current_length = 0
+
+    for char in article:
+        if char in "。！？":  # 遇到句号、问号、感叹号时分割
+            current_segment += char  # 这里添加了分隔符
+            if current_length + len(current_segment) <= min_length:
+                segments.append(current_segment)
+                current_segment = ""
+                current_length = 0
+            else:
+                # 处理当前段超过 min_length 字的情况
+                remaining = article[article.find(current_segment) + len(current_segment):]
+                split_point = remaining.find("。！？,")
+                if split_point!= -1:
+                    next_segment = current_segment + remaining[:split_point + 1] + remaining[split_point]  # 这里添加了分隔符
+                    if len(next_segment) <= min_length:
+                        segments.append(next_segment)
+                        current_segment = ""
+                        current_length = 0
+                        article = remaining[split_point + 1:]
+                    else:
+                        segments.append(current_segment)
+                        current_segment = ""
+                        current_length = 0
+                        article = remaining
+                else:
+                    segments.append(current_segment)
+                    current_segment = ""
+                    current_length = 0
+        else:
+            current_segment += char
+            current_length += len(char)
+
+    if current_segment:
+        segments.append(current_segment)
     # result = [convert_numbers_to_chinese(remove_chinese_punctuation(_.strip())) for _ in result if _.strip()]
-    result = [normalize_zh(_.strip()) for _ in result if _.strip()]
+     segments = [normalize_zh(_.strip()) for _ in segments if _.strip()]
     return result
 
 
