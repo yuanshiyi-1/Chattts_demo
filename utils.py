@@ -1,7 +1,9 @@
 try:
     import cn2an
 except ImportError:
-    print("The 'cn2an' module is not installed. Please install it using 'pip install cn2an'.")
+    print(
+        "The 'cn2an' module is not installed. Please install it using 'pip install cn2an'."
+    )
     exit(1)
 
 import re
@@ -87,9 +89,9 @@ def remove_chinese_punctuation(text):
     :param text:
     :return:
     """
-    text = re.sub(r'[^a-zA-Z0-9\u4e00-\u9fff\[\]\.,\？%\!\_、\u2026\"\"]', ',', text)
+    text = re.sub(r"[^a-zA-Z0-9\u4e00-\u9fff\[\]\.,\？%\!\_、\u2026\"\"]", ",", text)
     # 使用正则表达式将多个连续的句号替换为一个句号
-    text = re.sub(r'。{2,}', '。', text)
+    text = re.sub(r"。{2,}", "。", text)
     return text
 
 
@@ -100,16 +102,15 @@ def text_normalize(text):
     :return:
     """
     from zh_normalization import TextNormalizer
+
     # ref: https://github.com/PaddlePaddle/PaddleSpeech/tree/develop/paddlespeech/t2s/frontend/zh_normalization
     tx = TextNormalizer()
     sentences = tx.normalize(text)
     # print(sentences)
 
-    _txt = ''.join(sentences)
+    _txt = "".join(sentences)
     # 替换掉除中文之外的所有字符
-    _txt = re.sub(
-        r"[^\u4e00-\u9fa5，。！？、]+", "", _txt
-    )
+    _txt = re.sub(r"[^\u4e00-\u9fa5，。！？、]+", "", _txt)
 
     return _txt
 
@@ -164,15 +165,21 @@ def split_text(article, min_length=100):
                 current_length = 0
             else:
                 # 处理当前段超过 min_length 字的情况
-                remaining = article[article.find(current_segment) + len(current_segment):]
+                remaining = article[
+                    article.find(current_segment) + len(current_segment) :
+                ]
                 split_point = remaining.find("。！？,")
-                if split_point!= -1:
-                    next_segment = current_segment + remaining[:split_point + 1] + remaining[split_point]  # 这里添加了分隔符
+                if split_point != -1:
+                    next_segment = (
+                        current_segment
+                        + remaining[: split_point + 1]
+                        + remaining[split_point]
+                    )  # 这里添加了分隔符
                     if len(next_segment) <= min_length:
                         segments.append(next_segment)
                         current_segment = ""
                         current_length = 0
-                        article = remaining[split_point + 1:]
+                        article = remaining[split_point + 1 :]
                     else:
                         segments.append(current_segment)
                         current_segment = ""
@@ -185,9 +192,8 @@ def split_text(article, min_length=100):
         else:
             current_segment += char
             current_length += len(char)
-
-    if current_segment:
-        segments.append(current_segment)
+        if current_segment:
+            segments.append(current_segment)
     # result = [convert_numbers_to_chinese(remove_chinese_punctuation(_.strip())) for _ in result if _.strip()]
     segments = [normalize_zh(_.strip()) for _ in segments if _.strip()]
     return segments
@@ -205,7 +211,7 @@ def batch_split(items, batch_size=5):
     :param batch_size:
     :return:
     """
-    return [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
+    return [items[i : i + batch_size] for i in range(0, len(items), batch_size)]
 
 
 # 读取 txt 文件，支持自动判断文件编码
@@ -215,11 +221,11 @@ def read_long_text(file_path):
     :param file_path: 文件路径
     :return: 文本内容
     """
-    encodings = ['utf-8', 'gbk', 'iso-8859-1', 'utf-16']
+    encodings = ["utf-8", "gbk", "iso-8859-1", "utf-16"]
 
     for encoding in encodings:
         try:
-            with open(file_path, 'r', encoding=encoding) as file:
+            with open(file_path, "r", encoding=encoding) as file:
                 return file.read()
         except (UnicodeDecodeError, LookupError):
             continue
@@ -227,13 +233,12 @@ def read_long_text(file_path):
     raise ValueError("无法识别文件编码")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     txts = [
         "电影中梁朝伟扮演的陈永仁的编号27149",
         "这块黄金重达324.75克 我们班的最高总分为583分",
         "12\~23 -1.5\~2",
-
     ]
     for txt in txts:
-        print(txt, '-->', text_normalize(txt))
+        print(txt, "-->", text_normalize(txt))
         # print(txt, '-->', convert_numbers_to_chinese(txt))
