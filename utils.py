@@ -123,7 +123,7 @@ def convert_numbers_to_chinese(text):
     return cn2an.transform(text, "an2cn")
 
 
-def split_text(text, min_length=100):
+def split_text(article, min_length=100):
     """
     将文本分割为长度不小于min_length的句子
     :param text:
